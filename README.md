@@ -30,12 +30,16 @@ You can now add the component to the template of any of your Vue components with
 
 ```
 <AuthImage src="https://raw.githubusercontent.com/PixelstreamInc/auth-image/main/images/moon.jpg" />
+```
 
+or
+
+```
 <AuthImage
   src="https://raw.githubusercontent.com/PixelstreamInc/auth-image/main/images/moon@600.jpg"
   srcset="
     https://raw.githubusercontent.com/PixelstreamInc/auth-image/main/images/moon@600.jpg 600w, 
-    https://raw.githubusercontent.com/PixelstreamInc/auth-image/main/images/moon@2882.jpg 2882w
+    https://raw.githubusercontent.com/PixelstreamInc/auth-image/main/images/moon@2500.jpg 2500w
   "
   sizes="(min-width: 1024px) 33vw, 100vw"
 />
