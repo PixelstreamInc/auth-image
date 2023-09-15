@@ -29,17 +29,17 @@ app.mount('#app')
 You can now add the component to the template of any of your Vue components without having to import the AuthImage component or the C2PA library. Replace the src or srcset with your own C2PA encoded image(s).  You can use Photoshop Content Credentials to create your own C2PA enabled images or [Pixelstream C2PA Test Utility](https://c2patool.pixelstream.com) to embed a C2PA manifest into an image you already have to test this out further.
 
 ```
-<AuthImage src="https://raw.githubusercontent.com/PixelstreamInc/auth-image/main/images/moon.jpg" />
+<AuthImage src="signed-image.jpg" />
 ```
 
 or
 
 ```
 <AuthImage
-  src="https://raw.githubusercontent.com/PixelstreamInc/auth-image/main/images/moon@600.jpg"
+  src="signed-image.jpg"
   srcset="
-    https://raw.githubusercontent.com/PixelstreamInc/auth-image/main/images/moon@600.jpg 600w, 
-    https://raw.githubusercontent.com/PixelstreamInc/auth-image/main/images/moon@2500.jpg 2500w
+    signed-image@600.jpg 600w, 
+    signed-image@2500.jpg 2500w
   "
   sizes="(min-width: 1024px) 33vw, 100vw"
 />
