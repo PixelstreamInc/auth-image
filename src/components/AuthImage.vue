@@ -1,12 +1,12 @@
 <script>
   
   import { Popover, PopoverButton, PopoverPanel } from '@headlessui/vue'
-  import { generateVerifyUrl, selectProducer, selectEditsAndActivity, selectSocialAccounts } from 'c2pa'
+  import { createC2pa, createL2ManifestStore, selectProducer, selectSocialAccounts, selectEditsAndActivity, selectFormattedGenerator, selectGenerativeInfo, generateVerifyUrl } from 'c2pa'
   import { format, parseISO } from 'date-fns'
 
   /* These are the icons used for the 'info' icon on the image itself and the four social 
   media icons used on the popover panel */
-  import info from './svg/info.vue'
+  import cr from './svg/cr.vue'
   import behance from './svg/behance.vue'
   import twitter from './svg/twitter.vue'
   import instagram from './svg/instagram.vue'
@@ -15,10 +15,10 @@
 
   export default {
     
-    name: 'AuthImage',
+    name: 'NewAuthImage',
 
     components: {
-      Popover, PopoverButton, PopoverPanel, behance, twitter, instagram, facebook, github, info
+      Popover, PopoverButton, PopoverPanel, behance, twitter, instagram, facebook, github, cr
     },
 
     /* The promise returned by createC2pa() is 'provided' in the plugin and 'injected' here.
@@ -40,7 +40,33 @@
         manifestStore: null, // set by getContentCredentials method
         display: false, // Boolean for conditional display of the popover panel
         editsAndActivity: [], // set by the getContentCredentials method and not a computed because it's promise based.
-        imageSource: '' // this is our current source derived from the actual image displayed by the browser
+        imageSource: '', // this is our current source derived from the actual image displayed by the browser
+        i18n: {
+          'content credentials': {
+            'en-US': 'Content Credentials',
+            'es-ES': 'Credenciales de contenido'
+          },
+          'produced by': {
+            'en-US': 'Produced by',
+            'es-ES': 'Producido por'
+          },
+          'edits and activity': {
+            'en-US': 'Edits and activity',
+            'es-ES': 'Ediciones y actividad'
+          },
+          'assets used': {
+            'en-US': 'Assets used',
+            'es-ES': 'Activos utilizados'
+          },
+          'social media': {
+            'en-US': 'Social Media',
+            'es-ES': 'Redes sociales'
+          },
+          'see more': {
+            'en-US': 'Inspect',
+            'es-ES': 'Inspeccionar'
+          }
+        }
       }
     },
 
@@ -63,7 +89,7 @@
         return { 
           id: this.id,
           class: this.$attrs.class,
-          style: this.$attrs.ctyle,
+          style: this.$attrs.style,
           width: this.$attrs.width,
           height: this.$attrs.height,
           src: this.$attrs.src,
@@ -116,7 +142,7 @@
       property is used for the 'is' bound attribute on the component element/component to refer to 
       the imported name of the SVG component. Ex. <component :is="socialAccount.icon" /> */
       socialAccounts() {
-        return selectSocialAccounts(this.activeManifest).map(social => {
+        return selectSocialAccounts(this.activeManifest)?.map(social => {
           const icon = ['behance', 'twitter', 'facebook', 'instagram', 'github']
             .filter(sm => social['@id']
               .toLowerCase()
@@ -125,6 +151,13 @@
         })
       }
 
+    },
+
+    props: {
+      language: {
+        type: String,
+        default: 'en-US'
+      }
     },
 
     async mounted() {
@@ -180,7 +213,7 @@
           rather than returned by a computed property because the selector method returns a promise.  This 
           selector probably returns a promise, unlike the other selectors, because it might have to make a
           network request to get a dictionary file. */
-          this.editsAndActivity = this.activeManifest && await selectEditsAndActivity(this.activeManifest)
+          this.editsAndActivity = this.activeManifest && await selectEditsAndActivity(this.activeManifest, this.language)
         } catch (error) {
           console.error('Error reading image:', error)
         }
@@ -197,10 +230,10 @@
 
     <img @load="onloadHandler" v-bind="innerAttrs" class="w-full" />
     
-    <Popover v-if="activeManifest" class="absolute top-1 right-1">
+    <Popover v-if="activeManifest" class="absolute top-2 right-2">
       
       <PopoverButton>
-        <info class="w-6 h-6" />
+        <cr class="w-8 h-8" />
       </PopoverButton>
 
       <transition
@@ -212,14 +245,14 @@
         leave-to-class="translate-y-1 opacity-0"
       >
 
-        <PopoverPanel class="absolute z-10 top-8 right-1">
-          <div class="text-gray-800 text-xs bg-white rounded-lg px-4 py-1 overflow-auto w-56 h-80 shadow-lg">
+        <PopoverPanel class="absolute z-10 top-0 right-10">
+          <div class="text-gray-800 text-xs bg-white rounded-lg px-4 py-1 overflow-auto w-72 h-80 shadow-lg">
             
             <!-- Content Credential Section of Popover -->
-            <div v-if="activeManifest" class="my-3">
-              <h3 class="mb-3 uppercase font-bold">Content Credentials</h3>
+            <div v-if="activeManifest" class="mb-3 mt-2">
+              <h3 class="mb-3 text-lg font-bold">{{ i18n['content credentials'][language] }}</h3>
               <div class="flex items-center">
-                <img :src="activeManifestThumbnail" class="w-20 h-20 object-contain bg-gray-100 mr-2" alt="Active manifest thumbnail">
+                <img :src="activeManifestThumbnail" class="w-16 h-16 object-contain bg-gray-100 mr-2" alt="Active manifest thumbnail">
                 <div class="flex flex-col">
                   <span class="text-sm">{{ signatureIssuer }}</span>
                   <span class="text-gray-500">{{ signatureDate }}</span>
@@ -229,13 +262,13 @@
 
             <!-- Produced By Section of Popover -->
             <div v-if="producer" class="mb-3">
-              <h3 class="pt-3 mb-1 border-t uppercase font-bold">Produced by</h3>
+              <h3 class="pt-3 mb-1 border-t uppercase font-bold">{{ i18n['produced by'][language] }}</h3>
               <p class="text-sm">{{ producer }}</p>
             </div>
 
             <!-- Edits and Activity Section of Popover -->
             <div v-if="editsAndActivity?.length">
-              <h3 class="pt-3 pb-2 border-t uppercase font-bold">Edits and activity</h3>
+              <h3 class="pt-3 pb-2 border-t uppercase font-bold">{{ i18n['edits and activity'][language] }}</h3>
               <ul>
                 <li v-for="edit in editsAndActivity" :key="edit.id" class="flex flex-col mb-3">
                   <span class="text-sm">{{ edit.label }}</span>
@@ -246,17 +279,17 @@
 
             <!-- Assets Used Section of Popover -->
             <div v-if="ingredients?.length" class="mb-3">
-              <h3 class="py-3 border-t uppercase font-bold">Assets used</h3>
+              <h3 class="py-3 border-t uppercase font-bold">{{ i18n['assets used'][language] }}</h3>
               <ul class="flex flex-wrap mb-2">
                 <li v-for="ingredient in ingredients" :key="ingredient.instanceId" class="mr-2 mb-2">
-                  <img :src="ingredient.thumbnail.getUrl().url" class="w-14 h-14 object-contain bg-gray-100" alt="Thumbnail image from the active manifest.">
+                  <img v-if="ingredient.thumbnail" :src="ingredient.thumbnail?.getUrl().url" class="w-14 h-14 object-contain bg-gray-100" alt="Thumbnail image from the active manifest.">
                 </li>
               </ul>
             </div>
 
             <!-- Social Media Section of Popover -->
             <div v-if="socialAccounts?.length" class="mb-3">
-              <h3 class="py-3 border-t uppercase font-bold">Social Media</h3>
+              <h3 class="py-3 border-t uppercase font-bold">{{ i18n['social media'][language] }}</h3>
               <ul>
                 <li v-for="socialAccount in socialAccounts" :key="socialAccount['@id']" class="flex mb-3">
                   <component :is="socialAccount.icon" class="w-5 h-5 mr-3" />
@@ -267,7 +300,7 @@
 
             <!-- View More on Verify Button -->
             <div class="py-3 border-t">
-              <a :href="verifyUrl" target="_blank" class="block flex justify-center w-full text-sm text-gray-800 rounded-full border border-gray-400 py-2 mt-2 hover:bg-gray-100">See More</a>
+              <a :href="verifyUrl" target="_blank" class="block flex justify-center w-full text-sm text-gray-800 rounded-full border border-gray-400 py-2 mt-2 hover:bg-gray-100">{{ i18n['see more'][language] }}</a>
             </div>
 
           </div>

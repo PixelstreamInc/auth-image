@@ -8,9 +8,9 @@ export default defineConfig({
     lib: {
       // Could also be a dictionary or array of multiple entry points
       entry: resolve(__dirname, 'src/index.js'),
-      name: 'auth-image',
+      name: 'new-auth-image',
       // the proper extensions will be added
-      fileName: (format) => `auth-image.${format}.js`
+      fileName: (format) => `new-auth-image.${format}.js`
     },
     rollupOptions: {
       // make sure to externalize deps that shouldn't be bundled

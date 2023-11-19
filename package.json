@@ -1,5 +1,5 @@
 {
-  "name": "@pixelstream/auth-image",
+  "name": "@pixelstream/new-auth-image",
   "version": "0.0.12",
   "contributors": [
     {
@@ -11,18 +11,18 @@
   "description": "This plugin allows you to display C2PA enabled images with an information icon that shows the validated active manifest info.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/PixelstreamInc/auth-image"
+    "url": "https://github.com/PixelstreamInc/new-auth-image"
   },
   "type": "module",
   "files": [
     "dist"
   ],
-  "main": "./dist/auth-image.umd.js",
-  "module": "./dist/auth-image.es.js",
+  "main": "./dist/new-auth-image.umd.js",
+  "module": "./dist/new-auth-image.es.js",
   "exports": {
     ".": {
-      "import": "./dist/auth-image.es.js",
-      "require": "./dist/auth-image.umd.js"
+      "import": "./dist/new-auth-image.es.js",
+      "require": "./dist/new-auth-image.umd.js"
     },
     "./dist/style.css": "./dist/style.css"
   },
@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "@headlessui/vue": "^1.7.2",
-    "c2pa": "^0.11.2",
+    "c2pa": "^0.17.5",
     "date-fns": "^2.29.3",
     "lodash": "^4.17.21",
     "vue": "^3.2.37"
