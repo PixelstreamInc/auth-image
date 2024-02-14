@@ -9,17 +9,19 @@ This plugin allows you to display C2PA enabled images with an information icon t
 
 ## How to use
 
-From your Vue3/Vite project's root directory run
+Note: This package is no longer published on NPM, so to use it you will first need to clone the repo, build it locally, and link with NPM.
+
+Then, from your Vue3/Vite project's root directory run
 
 ```
-npm i @pixelstream/auth-image
+npm link @pixelstream/new-auth-image
 ```
 
 Open the project's main.js file and import the plugin and css. If this is a fresh install, replace the existing createApp(App).mount('#app') with
 
 ```
-import AuthImage from '@pixelstream/auth-image'
-import '@pixelstream/auth-image/dist/style.css'
+import AuthImage from '@pixelstream/new-auth-image'
+import '@pixelstream/new-auth-image/dist/style.css'
 
 const app = createApp(App)
 app.use(AuthImage)
